@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>El Juego Más Insano de GitHub</title>
+    <style>
+        body {
+            background-color: #111;
+            color: white;
+            font-family: sans-serif;
+            text-align: center;
+            margin: 0;
+            overflow: hidden;
+        }
+        canvas {
+            background-color: #222;
+            border: 4px solid #555;
+            display: block;
+            margin: 20px auto;
+        }
+        #dialogo {
+            font-size: 20px;
+            color: #ff3333;
+            font-weight: bold;
+            height: 30px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>¡Cuidado con la IA!</h1>
+    <div id="dialogo">IA: "Te estoy observando..."</div>
+    
+    <!-- Aquí se dibuja el juego -->
+    <canvas id="canvasJuego" width="800" height="500"></canvas>
+
+    <script>
+        const canvas = document.getElementById("canvasJuego");
+        const ctx = canvas.getContext("2d");
+        const textoIA = document.getElementById("dialogo");
+
+        // TÚ: El Óvalo
+        let jugador = { x: 100, y: 250, radioX: 30, radioY: 20, velocidad: 5 };
+        // LA IA: El perseguidor (un cuadrado rojo)
+        let ia = { x: 700, y: 250, tamano: 40, velocidad: 2 };
+
+        // Detectar teclas presionadas
+        let teclas = {};
+        window.addEventListener("keydown", (e) => teclas[e.key] = true);
+        window.addEventListener("keyup", (e) => teclas[e.key] = false);
+
+        // Lista de frases locas que la IA puede decir al azar
+        const frasesIA = [
+            "¡No puedes correr para siempre!",
+            "¿Eso es todo lo que sabes moverte?",
+            "Te tengo acorralado, óvalo.",
+            "¡Vuelve aquí!"
+        ];
+
+        // Cambiar la frase de la IA cada 3 segundos de forma autónoma
+        setInterval(() => {
+            const fraseAleatoria = frasesIA[Math.floor(Math.random() * frasesIA.length)];
+            textoIA.innerText = "IA: \"" + fraseAleatoria + "\"";
+        }, 3000);
+
+        // Bucle principal del juego (se ejecuta 60 veces por segundo)
+        function actualizar() {
+            // 1. Movimiento del Óvalo (WASD o Flechitas)
+            if (teclas["w"] || teclas["ArrowUp"]) jugador.y -= jugador.velocidad;
+            if (teclas["s"] || teclas["ArrowDown"]) jugador.y += jugador.velocidad;
+            if (teclas["a"] || teclas["ArrowLeft"]) jugador.x -= jugador.velocidad;
+            if (teclas["d"] || teclas["ArrowRight"]) jugador.x += jugador.velocidad;
+
+            // 2. Movimiento Autónomo de la IA (Te persigue físicamente)
+            if (ia.x < jugador.x) ia.x += ia.velocidad;
+            if (ia.x > jugador.x) ia.x -= ia.velocidad;
+            if (ia.y < jugador.y) ia.y += ia.velocidad;
+            if (ia.y > jugador.y) ia.y -= ia.velocidad;
+
+            // 3. Dibujar todo en la pantalla web
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Limpiar pantalla
+
+            // Dibujar al Jugador (Óvalo Verde)
+            ctx.fillStyle = "#33ff33";
+            ctx.beginPath();
+            ctx.ellipse(jugador.x, jugador.y, jugador.radioX, jugador.radioY, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Dibujar a la IA (Cuadrado Rojo)
+            ctx.fillStyle = "#ff3333";
+            ctx.fillRect(ia.x - ia.tamano/2, ia.y - ia.tamano/2, ia.tamano, ia.tamano);
+
+            requestAnimationFrame(actualizar);
+        }
+
+        actualizar(); // Arrancar el juego
+    </script>
+</body>
+</html>
