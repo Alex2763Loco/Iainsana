@@ -2,119 +2,156 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>IA insana - Modo Pro</title>
+    <title>IA insana</title>
     <style>
-        body { 
-            background-color: #111; 
-            color: #fff; 
-            text-align: center; 
-            font-family: 'Segoe UI', sans-serif; 
-            margin: 0; 
-            overflow: hidden; 
+        body {
+            background-color: #111;
+            color: white;
+            font-family: sans-serif;
+            text-align: center;
+            margin: 0;
+            overflow: hidden;
         }
-        canvas { 
-            background-color: #1a1a20; 
-            border: 5px solid #444; 
-            display: block; 
-            margin: 15px auto; 
-            box-shadow: 0px 0px 30px rgba(0, 0, 0, 0.5); 
+        canvas {
+            background-color: #1e1e24; /* Fondo tipo alfombra de oficina oscura */
+            border: 4px solid #3a3a43;
+            display: block;
+            margin: 20px auto;
+            box-shadow: 0px 0px 20px rgba(255, 0, 0, 0.2);
         }
-        h1 { margin-top: 10px; color: #ff3333; }
-        
-        /* Controles táctiles ordenados */
-        #panel-controles { display: flex; flex-direction: column; align-items: center; gap: 10px; }
-        .fila-btn { display: flex; gap: 20px; }
-        .boton-juego { 
-            width: 75px; 
-            height: 75px; 
-            font-size: 30px; 
-            background: #333; 
-            border: 3px solid #666; 
-            color: white; 
-            border-radius: 15px; 
-            touch-action: manipulation;
-            cursor: pointer;
+        #dialogo {
+            font-size: 20px;
+            color: #ff3333;
+            font-weight: bold;
+            height: 30px;
+            text-shadow: 0px 0px 10px rgba(255, 0, 0, 0.5);
         }
     </style>
 </head>
 <body>
 
     <h1>La IA te ama w</h1>
-    <canvas id="juego" width="800" height="400"></canvas>
-
-    <div id="panel-controles">
-        <button id="arriba" class="boton-juego">⬆️</button>
-        <div class="fila-btn">
-            <button id="izquierda" class="boton-juego">⬅️</button>
-            <button id="abajo" class="boton-juego">⬇️</button>
-            <button id="derecha" class="boton-juego">➡️</button>
-        </div>
-    </div>
+    <div id="dialogo">IA: "¡FIRMA LA SOLICITUD DE TRABAJO!"</div>
+    
+    <canvas id="canvasJuego" width="800" height="500"></canvas>
 
     <script>
-        // Configuración inicial del motor de juego
-        const canvas = document.getElementById("juego");
+        const canvas = document.getElementById("canvasJuego");
         const ctx = canvas.getContext("2d");
-        
-        let jugador = { x: 100, y: 200, w: 30, h: 30, vel: 6 };
-        let ia = { x: 700, y: 200, w: 40, h: 50, vel: 2.5 };
-        let teclas = {};
+        const textoIA = document.getElementById("dialogo");
 
-        // Escuchar teclado
+        // TÚ: La Persona Random (Oficinista)
+        let jugador = { x: 100, y: 250, radioX: 20, radioY: 25, velocidad: 5 };
+        // LA IA: La Solicitud de Trabajo Monstruosa
+        let ia = { x: 700, y: 250, ancho: 45, alto: 60, velocidad: 2.3 };
+
+        // Detectar teclas presionadas
+        let teclas = {};
         window.addEventListener("keydown", (e) => teclas[e.key] = true);
         window.addEventListener("keyup", (e) => teclas[e.key] = false);
 
-        // Configurar botones táctiles
-        function vincularBoton(id, nombreTecla) {
-            const btn = document.getElementById(id);
-            btn.onpointerdown = () => teclas[nombreTecla] = true;
-            btn.onpointerup = () => teclas[nombreTecla] = false;
-        }
-        
-        vincularBoton("arriba", "ArrowUp");
-        vincularBoton("abajo", "ArrowDown");
-        vincularBoton("izquierda", "ArrowLeft");
-        vincularBoton("derecha", "ArrowRight");
+        // Diálogos de la Solicitud de Trabajo acosadora
+        const frasesIA = [
+            "¡Necesitamos horas extra gratis!",
+            "¡Firma aquí abajo, no huyas!",
+            "Tu currículum ha sido ACEPTADO.",
+            "¿Por qué corres? ¡Es una gran oportunidad laboral!",
+            "¡El jefe quiere hablar contigo!"
+        ];
 
-        // Bucle principal (Game Loop)
-        function loop() {
-            // Movimiento del jugador
-            if ((teclas["ArrowUp"] || teclas["w"]) && jugador.y > 0) jugador.y -= jugador.vel;
-            if ((teclas["ArrowDown"] || teclas["s"]) && jugador.y < canvas.height - jugador.h) jugador.y += jugador.vel;
-            if ((teclas["ArrowLeft"] || teclas["a"]) && jugador.x > 0) jugador.x -= jugador.vel;
-            if ((teclas["ArrowRight"] || teclas["d"]) && jugador.x < canvas.width - jugador.w) jugador.x += jugador.vel;
+        // Cambiar la frase cada 3 segundos
+        setInterval(() => {
+            const fraseAleatoria = frasesIA[Math.floor(Math.random() * frasesIA.length)];
+            textoIA.innerText = "IA: \"" + fraseAleatoria + "\"";
+        }, 3000);
 
-            // Inteligencia artificial (seguimiento suave)
-            ia.x += (jugador.x - ia.x) * 0.03;
-            ia.y += (jugador.y - ia.y) * 0.03;
+        // Bucle principal del juego
+        function actualizar() {
+            // 1. Movimiento del Jugador con límites de pantalla
+            if (teclas["w"] || teclas["ArrowUp"]) {
+                jugador.y -= jugador.velocidad;
+                if (jugador.y < jugador.radioY) jugador.y = jugador.radioY;
+            }
+            if (teclas["s"] || teclas["ArrowDown"]) {
+                jugador.y += jugador.velocidad;
+                if (jugador.y > canvas.height - jugador.radioY) jugador.y = canvas.height - jugador.radioY;
+            }
+            if (teclas["a"] || teclas["ArrowLeft"]) {
+                jugador.x -= jugador.velocidad;
+                if (jugador.x < jugador.radioX) jugador.x = jugador.radioX;
+            }
+            if (teclas["d"] || teclas["ArrowRight"]) {
+                jugador.x += jugador.velocidad;
+                if (jugador.x > canvas.width - jugador.radioX) jugador.x = canvas.width - jugador.radioX;
+            }
 
-            // Limpiar pantalla
+            // 2. Movimiento de la IA (La solicitud te persigue)
+            if (ia.x < jugador.x) ia.x += ia.velocidad;
+            if (ia.x > jugador.x) ia.x -= ia.velocidad;
+            if (ia.y < jugador.y) ia.y += ia.velocidad;
+            if (ia.y > jugador.y) ia.y -= ia.velocidad;
+
+            // 3. Dibujar todo
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Dibujar al jugador (Oficinista)
-            ctx.fillStyle = "#3498db";
-            ctx.fillRect(jugador.x, jugador.y, jugador.w, jugador.h);
-
-            // Dibujar a la IA (La solicitud)
-            ctx.fillStyle = "#ecf0f1";
-            ctx.fillRect(ia.x, ia.y, ia.w, ia.h);
+            // === DIBUJAR JUGADOR (Persona de Oficina) ===
+            // Cuerpo/Traje Azul
+            ctx.fillStyle = "#2b5cb3";
+            ctx.beginPath();
+            ctx.ellipse(jugador.x, jugador.y + 10, jugador.radioX, jugador.radioY - 5, 0, 0, Math.PI * 2);
+            ctx.fill();
             
-            // Detalles de la solicitud
-            ctx.fillStyle = "red";
-            ctx.font = "12px Arial";
-            ctx.fillText("JOB", ia.x + 8, ia.y + 25);
+            // Cabeza (Color piel)
+            ctx.fillStyle = "#ffdbac";
+            ctx.beginPath();
+            ctx.arc(jugador.x, jugador.y - 15, 14, 0, Math.PI * 2);
+            ctx.fill();
 
-            requestAnimationFrame(loop);
+            // Ojos asustados (Blancos con pupilas negras)
+            ctx.fillStyle = "#fff";
+            ctx.beginPath();
+            ctx.arc(jugador.x - 5, jugador.y - 17, 4, 0, Math.PI * 2);
+            ctx.arc(jugador.x + 5, jugador.y - 17, 4, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = "#000";
+            ctx.beginPath();
+            // Las pupilas miran hacia la derecha (donde suele estar el peligro)
+            ctx.arc(jugador.x - 4, jugador.y - 17, 1.5, 0, Math.PI * 2);
+            ctx.arc(jugador.x + 6, jugador.y - 17, 1.5, 0, Math.PI * 2);
+            ctx.fill();
+
+
+            // === DIBUJAR IA (La Solicitud de Trabajo) ===
+            ctx.save();
+            // Dibujar la hoja de papel blanca
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(ia.x - ia.ancho/2, ia.y - ia.alto/2, ia.ancho, ia.alto);
+            
+            // Líneas de texto falsas en la hoja
+            ctx.strokeStyle = "#777777";
+            ctx.lineWidth = 2;
+            for (let i = -15; i <= 15; i += 8) {
+                ctx.beginPath();
+                ctx.moveTo(ia.x - 15, ia.y + i);
+                ctx.lineTo(ia.x + 15, ia.y + i);
+                ctx.stroke();
+            }
+
+            // Sello rojo de "TRABAJO" o "FIRMADO" en la esquina de la hoja
+            ctx.fillStyle = "rgba(255, 0, 0, 0.7)";
+            ctx.font = "bold 9px sans-serif";
+            ctx.fillText("JOB", ia.x - 12, ia.y - 18);
+            ctx.strokeStyle = "red";
+            ctx.lineWidth = 1;
+            ctx.strokeRect(ia.x - 15, ia.y - 25, 26, 10);
+            
+            ctx.restore();
+
+            requestAnimationFrame(actualizar);
         }
 
-        // Iniciar
-        loop();
-
-        // ESPACIO PARA AGREGAR NUEVAS FUNCIONES MÁS ADELANTE...
-        // Aquí puedes poner tu contador de puntos, niveles de dificultad,
-        // pantallas de Game Over, o cualquier otra locura que se te ocurra.
-        // Tener más líneas te da libertad para crear cosas épicas sin romper nada.
-
+        // Arrancar el juego
+        actualizar();
     </script>
 </body>
 </html>
