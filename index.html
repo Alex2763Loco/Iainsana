@@ -13,23 +13,25 @@
             overflow: hidden;
         }
         canvas {
-            background-color: #222;
-            border: 4px solid #555;
+            background-color: #1e1e24; /* Fondo tipo alfombra de oficina oscura */
+            border: 4px solid #3a3a43;
             display: block;
             margin: 20px auto;
+            box-shadow: 0px 0px 20px rgba(255, 0, 0, 0.2);
         }
         #dialogo {
             font-size: 20px;
             color: #ff3333;
             font-weight: bold;
             height: 30px;
+            text-shadow: 0px 0px 10px rgba(255, 0, 0, 0.5);
         }
     </style>
 </head>
 <body>
 
     <h1>La IA te ama w</h1>
-    <div id="dialogo">IA: "Te estoy observando..."</div>
+    <div id="dialogo">IA: "¡FIRMA LA SOLICITUD DE TRABAJO!"</div>
     
     <canvas id="canvasJuego" width="800" height="500"></canvas>
 
@@ -38,22 +40,23 @@
         const ctx = canvas.getContext("2d");
         const textoIA = document.getElementById("dialogo");
 
-        // TÚ: El Óvalo
-        let jugador = { x: 100, y: 250, radioX: 30, radioY: 20, velocidad: 5 };
-        // LA IA: El perseguidor
-        let ia = { x: 700, y: 250, tamano: 40, velocidad: 2 };
+        // TÚ: La Persona Random (Oficinista)
+        let jugador = { x: 100, y: 250, radioX: 20, radioY: 25, velocidad: 5 };
+        // LA IA: La Solicitud de Trabajo Monstruosa
+        let ia = { x: 700, y: 250, ancho: 45, alto: 60, velocidad: 2.3 };
 
         // Detectar teclas presionadas
         let teclas = {};
         window.addEventListener("keydown", (e) => teclas[e.key] = true);
         window.addEventListener("keyup", (e) => teclas[e.key] = false);
 
-        // Lista de frases locas
+        // Diálogos de la Solicitud de Trabajo acosadora
         const frasesIA = [
-            "¡No puedes correr para siempre!",
-            "¿Eso es todo lo que sabes moverte?",
-            "Te tengo acorralado, óvalo.",
-            "¡Vuelve aquí!"
+            "¡Necesitamos horas extra gratis!",
+            "¡Firma aquí abajo, no huyas!",
+            "Tu currículum ha sido ACEPTADO.",
+            "¿Por qué corres? ¡Es una gran oportunidad laboral!",
+            "¡El jefe quiere hablar contigo!"
         ];
 
         // Cambiar la frase cada 3 segundos
@@ -64,7 +67,7 @@
 
         // Bucle principal del juego
         function actualizar() {
-            // 1. Movimiento del Óvalo con límites de pantalla
+            // 1. Movimiento del Jugador con límites de pantalla
             if (teclas["w"] || teclas["ArrowUp"]) {
                 jugador.y -= jugador.velocidad;
                 if (jugador.y < jugador.radioY) jugador.y = jugador.radioY;
@@ -82,7 +85,7 @@
                 if (jugador.x > canvas.width - jugador.radioX) jugador.x = canvas.width - jugador.radioX;
             }
 
-            // 2. Movimiento de la IA
+            // 2. Movimiento de la IA (La solicitud te persigue)
             if (ia.x < jugador.x) ia.x += ia.velocidad;
             if (ia.x > jugador.x) ia.x -= ia.velocidad;
             if (ia.y < jugador.y) ia.y += ia.velocidad;
@@ -91,15 +94,58 @@
             // 3. Dibujar todo
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Dibujar al Jugador (Óvalo Verde)
-            ctx.fillStyle = "#33ff33";
+            // === DIBUJAR JUGADOR (Persona de Oficina) ===
+            // Cuerpo/Traje Azul
+            ctx.fillStyle = "#2b5cb3";
             ctx.beginPath();
-            ctx.ellipse(jugador.x, jugador.y, jugador.radioX, jugador.radioY, 0, 0, Math.PI * 2);
+            ctx.ellipse(jugador.x, jugador.y + 10, jugador.radioX, jugador.radioY - 5, 0, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Cabeza (Color piel)
+            ctx.fillStyle = "#ffdbac";
+            ctx.beginPath();
+            ctx.arc(jugador.x, jugador.y - 15, 14, 0, Math.PI * 2);
             ctx.fill();
 
-            // Dibujar a la IA (Cuadrado Rojo)
-            ctx.fillStyle = "#ff3333";
-            ctx.fillRect(ia.x - ia.tamano/2, ia.y - ia.tamano/2, ia.tamano, ia.tamano);
+            // Ojos asustados (Blancos con pupilas negras)
+            ctx.fillStyle = "#fff";
+            ctx.beginPath();
+            ctx.arc(jugador.x - 5, jugador.y - 17, 4, 0, Math.PI * 2);
+            ctx.arc(jugador.x + 5, jugador.y - 17, 4, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = "#000";
+            ctx.beginPath();
+            // Las pupilas miran hacia la derecha (donde suele estar el peligro)
+            ctx.arc(jugador.x - 4, jugador.y - 17, 1.5, 0, Math.PI * 2);
+            ctx.arc(jugador.x + 6, jugador.y - 17, 1.5, 0, Math.PI * 2);
+            ctx.fill();
+
+
+            // === DIBUJAR IA (La Solicitud de Trabajo) ===
+            ctx.save();
+            // Dibujar la hoja de papel blanca
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(ia.x - ia.ancho/2, ia.y - ia.alto/2, ia.ancho, ia.alto);
+            
+            // Líneas de texto falsas en la hoja
+            ctx.strokeStyle = "#777777";
+            ctx.lineWidth = 2;
+            for (let i = -15; i <= 15; i += 8) {
+                ctx.beginPath();
+                ctx.moveTo(ia.x - 15, ia.y + i);
+                ctx.lineTo(ia.x + 15, ia.y + i);
+                ctx.stroke();
+            }
+
+            // Sello rojo de "TRABAJO" o "FIRMADO" en la esquina de la hoja
+            ctx.fillStyle = "rgba(255, 0, 0, 0.7)";
+            ctx.font = "bold 9px sans-serif";
+            ctx.fillText("JOB", ia.x - 12, ia.y - 18);
+            ctx.strokeStyle = "red";
+            ctx.lineWidth = 1;
+            ctx.strokeRect(ia.x - 15, ia.y - 25, 26, 10);
+            
+            ctx.restore();
 
             requestAnimationFrame(actualizar);
         }
