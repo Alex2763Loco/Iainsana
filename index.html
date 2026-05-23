@@ -150,7 +150,39 @@
 
             requestAnimationFrame(actualizar);
         }
+const listaMusicas = ["Who Likes to Party.mp3", "New Friendly.mp3", "Radio Martini.mp3"];
+let musicaActual = new Audio();
+const btnMusica = document.createElement("button");
+        // Configuración visual del botón
+btnMusica.innerText = "🔊 Música: ON";
+btnMusica.style.position = "absolute";
+btnMusica.style.top = "10px";
+btnMusica.style.left = "10px";
+btnMusica.style.zIndex = "1000";
+document.body.appendChild(btnMusica);
 
+// Función para reproducir aleatoriamente
+function reproducirAleatorio() {
+    const indiceAleatorio = Math.floor(Math.random() * listaMusicas.length);
+    musicaActual.src = listaMusicas[indiceAleatorio];
+    musicaActual.loop = true; 
+    musicaActual.play().catch(e => console.log("Espera interacción"));
+}
+
+// Evento del botón
+btnMusica.addEventListener("click", () => {
+    if (musicaActual.paused) {
+        if (musicaActual.src === "" || musicaActual.src === window.location.href) {
+            reproducirAleatorio();
+        } else {
+            musicaActual.play();
+        }
+        btnMusica.innerText = "🔊 Música: ON";
+    } else {
+        musicaActual.pause();
+        btnMusica.innerText = "🔇 Música: OFF";
+    }
+});
         // Arrancar el juego
         actualizar();
     </script>
