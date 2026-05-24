@@ -6,6 +6,6 @@ leeeme porfavor. Antes de que juegues este proyecto no esta disponible para disp
 Que disfrutes el juego :)
 
 
-#CONTROLES
+# CONTROLES
 
 WASD para el movimiento. Nada mas xd
